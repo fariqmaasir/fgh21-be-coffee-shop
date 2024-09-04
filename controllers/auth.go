@@ -35,7 +35,7 @@ func AuthLogin(c *gin.Context) {
 		lib.HandlerUnauthorized(c, "Wrong password")
 		return
 	} else {
-		token := lib.GenerateUserTokenById(found.Id)
+		token := lib.GenerateUserTokenById(found.Id, found.RoleId)
 		lib.HandlerOK(c, "Login success", dtos.Token{Token: token}, nil)
 	}
 }

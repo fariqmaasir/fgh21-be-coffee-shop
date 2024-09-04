@@ -7,9 +7,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateUserTokenById(id int) string {
+func GenerateUserTokenById(id int, role int) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id": id,
+		"id":   id,
+		"role": role,
 		"iat": jwt.NumericDate{
 			Time: time.Now(),
 		},
