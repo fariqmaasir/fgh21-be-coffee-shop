@@ -15,12 +15,12 @@ func CreateTransactionDetail(data models.TransactionDetail) (models.TransactionD
 	fmt.Println(data)
 	sql := `
 		INSERT INTO transaction_details 
-		(quantity, product_id, variant_id, product_size_id)
+		(quantity, product_id, transaction_id, variant_id, product_size_id)
 		VALUES
-		($1, $2, $3, $4) RETURNING *
+		($1, $2, $3, $4, $5) RETURNING *
 	`
 
-	row, err := db.Query(context.Background(), sql, data.Quantity, data.ProductId, data.VariantId, data.ProductSizeId)
+	row, err := db.Query(context.Background(), sql, data.Quantity, data.ProductId, data.Transaction, data.VariantId, data.ProductSizeId)
 	if err != nil {
 		return models.TransactionDetail{}, err
 	}
@@ -38,15 +38,16 @@ func FindTransactionDetailById(id int) (models.TransactionDetailJoin, error) {
 	db := lib.DB()
 	defer db.Close(context.Background())
 
-	sql := `SELECT  transactions.no_order, transactions.add_full_name, transactions.add_address, transactions.payment , transaction_status.name AS transaction_status, array_agg(transaction_details.quantity) as quantity, array_agg(products.price) AS price, order_types.name AS order_type, profile.phone_number
+	sql := `
+	SELECT  transactions.no_order, transactions.add_full_name, transactions.add_address, transactions.payment , transaction_status.name AS transaction_status,SUM(transaction_details.quantity) as quantity, SUM(products.price) AS price, order_types.name AS order_type, profile.phone_number
 	FROM transaction_details
-	INNER JOIN transactions ON transactions.transaction_detail_id = transaction_details.id
+	INNER JOIN transactions ON transactions.id = transaction_details.transaction_id
 	INNER JOIN transaction_status on transactions.transaction_status_id = transaction_status.id
 	INNER JOIN order_types on transactions.order_type_id = order_types.id
 	INNER JOIN profile on transactions.user_id = profile.user_id
 	INNER JOIN products on transaction_details.product_id = products.id
     WHERE no_order = $1
-    GROUP BY transactions.no_order, transactions.add_full_name, transactions.add_address, transactions.payment , transaction_status.name, order_types.name, profile.phone_number LIMIT 100
+    GROUP BY transactions.no_order, transactions.add_full_name, transactions.add_address, transactions.payment , transaction_status.name, order_types.name, profile.phone_number
 	`
 
 	row, err := db.Query(context.Background(), sql, id)
@@ -73,7 +74,7 @@ func FindTransactionProductById(id int) ([]models.TransactionProduct, error) {
 	sql := `
 	SELECT no_order, products.title, transaction_details.quantity, product_variants.name, product_sizes.name, order_types.name, products.price
 	FROM transactions
-	INNER JOIN transaction_details on transactions.transaction_detail_id = transaction_details.id
+	INNER JOIN transaction_details on transactions.id = transaction_details.transaction_id
 	INNER JOIN products on transaction_details.product_id = products.id
 	INNER JOIN product_sizes on transaction_details.product_size_id = product_sizes.id
 	INNER JOIN product_variants on transaction_details.variant_id = product_variants.id
@@ -103,8 +104,8 @@ func FindTransactionByUserId(id int) ([]models.TransactionJoin, error) {
 	defer db.Close(context.Background())
 
 	sql := `
-		SELECT transactions.no_order, transaction_status.name as order_type, array_agg(transaction_details.quantity) as quantity, array_agg(products.price) as price  FROM transactions
-		INNER JOIN transaction_details ON transactions.transaction_detail_id = transaction_details.id
+		SELECT transactions.no_order, transaction_status.name as order_type, SUM(transaction_details.quantity) as quantity, SUM(products.price) as price  FROM transactions
+		INNER JOIN transaction_details ON transactions.id = transaction_details.transaction_id
 		INNER JOIN products ON transaction_details.id = products.id
 		INNER JOIN transaction_status ON transactions.transaction_status_id = transaction_status.id
 		WHERE transactions.user_id = $1

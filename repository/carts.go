@@ -20,7 +20,7 @@ func FindAllCarts(id int) ([]models.CartsJoin, error) {
 	// 	join users u on u.id = c.user_id
 	// 	where c.id = 1;`
 
-	sql := `SELECT carts.id, carts.transaction_detail_id, carts.quantity, product_variants.name as variant, product_sizes.name as size, products.title, products.price  FROM carts
+	sql := `SELECT carts.id, carts.quantity, product_variants.name as variant, product_sizes.name as size, products.title, products.price  FROM carts
 			INNER JOIN product_variants ON carts.variant_id = product_variants.id
 			INNER JOIN product_sizes ON carts.sizes_id = product_sizes.id
 			INNER JOIN products on carts.product_id = products.id
@@ -48,11 +48,11 @@ func CreateCarts(data models.Carts) (models.Carts, error) {
 	fmt.Println(data)
 	// fmt.Println(userId)
 
-	sql := `INSERT INTO carts ("transaction_detail_id", "quantity", "variant_id", "sizes_id", "product_id", "user_id") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id", "transaction_detail_id", "quantity", "variant_id", "sizes_id", "product_id", "user_id"`
+	sql := `INSERT INTO carts ("quantity", "variant_id", "sizes_id", "product_id", "user_id") VALUES ($1, $2, $3, $4, $5) RETURNING "id", "quantity", "variant_id", "sizes_id", "product_id", "user_id"`
 
 	// sql := `insert into carts "quantity" values $1 returning "id", "quantity", "variant_id", "sizes_id", "product_id", "user_id"`
 
-	row, _ := db.Query(context.Background(), sql, data.TransactionDetail, data.Quantity, data.VariantId, data.ProductSizeId, data.ProductId, data.UserId)
+	row, _ := db.Query(context.Background(), sql, data.Quantity, data.VariantId, data.ProductSizeId, data.ProductId, data.UserId)
 	results, err := pgx.CollectOneRow(row, pgx.RowToStructByPos[models.Carts])
 	if err != nil {
 		fmt.Println(err)

@@ -69,7 +69,9 @@ func CreateTransactionDetails(c *gin.Context) {
 		lib.HandlerBadReq(c, "Invalid")
 		return
 	}
+	fmt.Print(err)
 	id, err := strconv.Atoi(c.Param("id"))
+	fmt.Println(id)
 	if err != nil {
 		lib.HandlerBadReq(c, "Invalid Product Id")
 		return
@@ -77,6 +79,7 @@ func CreateTransactionDetails(c *gin.Context) {
 	data, err := repository.CreateTransactionDetail(models.TransactionDetail{
 		Quantity:      formTransaction.Quantity,
 		ProductId:     id,
+		Transaction:   formTransaction.Transaction,
 		VariantId:     formTransaction.Variant,
 		ProductSizeId: formTransaction.ProductSize,
 	})
@@ -101,35 +104,34 @@ func CreateTransaction(c *gin.Context) {
 	}
 	fmt.Println(userId)
 	noOrder := rand.Intn(90000) + 10000
-	for i := range formTransaction.TransactionDetail {
-		repository.CreateTransaction(models.Transaction{
-			NoOrder:             noOrder,
-			AddFullName:         formTransaction.FullName,
-			AddEmail:            formTransaction.Email,
-			AddAddress:          formTransaction.Address,
-			Payment:             formTransaction.Payment,
-			UserId:              userId,
-			TransactionDetail:   formTransaction.TransactionDetail[i],
-			OrderTypeId:         formTransaction.OrderType,
-			TransactionStatusId: formTransaction.TransactionStatus,
-		})
-	}
-	// data, err := repository.CreateTransaction(models.Transaction{
-	// 	NoOrder:             noOrder,
-	// 	AddFullName:         formTransaction.FullName,
-	// 	AddEmail:            formTransaction.Email,
-	// 	AddAddress:          formTransaction.Address,
-	// 	Payment:             formTransaction.Payment,
-	// 	UserId:              userId,
-	// 	TransactionDetail:   formTransaction.TransactionDetail,
-	// 	OrderTypeId:         formTransaction.OrderType,
-	// 	TransactionStatusId: formTransaction.TransactionStatus,
-	// })
+	// for i := range formTransaction.TransactionDetail {
+	// 	repository.CreateTransaction(models.Transaction{
+	// 		NoOrder:             noOrder,
+	// 		AddFullName:         formTransaction.FullName,
+	// 		AddEmail:            formTransaction.Email,
+	// 		AddAddress:          formTransaction.Address,
+	// 		Payment:             formTransaction.Payment,
+	// 		UserId:              userId,
+	// 		TransactionDetail:   formTransaction.TransactionDetail[i],
+	// 		OrderTypeId:         formTransaction.OrderType,
+	// 		TransactionStatusId: formTransaction.TransactionStatus,
+	// 	})
+	// }
+	data, err := repository.CreateTransaction(models.Transaction{
+		NoOrder:             noOrder,
+		AddFullName:         formTransaction.FullName,
+		AddEmail:            formTransaction.Email,
+		AddAddress:          formTransaction.Address,
+		Payment:             formTransaction.Payment,
+		UserId:              userId,
+		OrderTypeId:         formTransaction.OrderType,
+		TransactionStatusId: formTransaction.TransactionStatus,
+	})
 	fmt.Println(err)
 	if err != nil {
 		lib.HandlerBadReq(c, "Invalid Data")
 		return
 	}
 
-	lib.HandlerOK(c, "transaction success", nil, nil)
+	lib.HandlerOK(c, "transaction success", data, nil)
 }

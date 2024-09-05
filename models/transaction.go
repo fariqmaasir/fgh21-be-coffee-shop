@@ -8,7 +8,6 @@ type Transaction struct {
 	AddAddress          string
 	Payment             string
 	UserId              int
-	TransactionDetail   int
 	OrderTypeId         int
 	TransactionStatusId int
 }
@@ -16,6 +15,6 @@ type Transaction struct {
 type TransactionJoin struct {
 	NoOrder    int
 	OrderTypes string
-	Quantity   []int
-	Price      []int
+	Quantity   int
+	Price      int
 }

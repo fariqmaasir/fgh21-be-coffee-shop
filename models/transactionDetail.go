@@ -4,6 +4,7 @@ type TransactionDetail struct {
 	Id            int `json:"id"`
 	Quantity      int `json:"quantity"`
 	ProductId     int `json:"productId" db:"product_id"`
+	Transaction   int `json:"transaction" db:"transaction_id"`
 	VariantId     int `json:"variantId" db:"variant_id"`
 	ProductSizeId int `json:"productSizeId" db:"product_size_id"`
 }
@@ -24,8 +25,8 @@ type TransactionDetailJoin struct {
 	Address           string  `json:"address"`
 	Payment           string  `json:"payment"`
 	TransactionStatus string  `json:"transactionStatus"`
-	Quantity          []int   `json:"quantity"`
-	Price             []int   `json:"price"`
+	Quantity          int     `json:"quantity"`
+	Price             int     `json:"price"`
 	OrderType         string  `json:"orderType"`
 	PhoneNumber       *string `json:"phoneNumber"`
 }

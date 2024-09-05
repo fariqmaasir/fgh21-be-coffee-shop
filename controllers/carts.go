@@ -41,12 +41,11 @@ func CreateOneCarts(ctx *gin.Context) {
 	}
 
 	carts, err := repository.CreateCarts(models.Carts{
-		TransactionDetail: form.TransactionDetail,
-		Quantity:          form.Quantity,
-		VariantId:         form.Variant,
-		ProductSizeId:     form.ProductSize,
-		ProductId:         productId,
-		UserId:            userId,
+		Quantity:      form.Quantity,
+		VariantId:     form.Variant,
+		ProductSizeId: form.ProductSize,
+		ProductId:     productId,
+		UserId:        userId,
 	})
 
 	if err != nil {
