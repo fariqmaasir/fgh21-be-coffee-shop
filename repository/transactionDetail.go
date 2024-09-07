@@ -106,7 +106,7 @@ func FindTransactionByUserId(id int) ([]models.TransactionJoin, error) {
 	sql := `
 		SELECT transactions.no_order, transaction_status.name as order_type, SUM(transaction_details.quantity) as quantity, SUM(products.price) as price  FROM transactions
 		INNER JOIN transaction_details ON transactions.id = transaction_details.transaction_id
-		INNER JOIN products ON transaction_details.id = products.id
+		INNER JOIN products ON transaction_details.product_id = products.id
 		INNER JOIN transaction_status ON transactions.transaction_status_id = transaction_status.id
 		WHERE transactions.user_id = $1
         GROUP BY transactions.no_order, transaction_status.name
